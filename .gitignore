@@ -1,0 +1,17 @@
+# IntelliJ IDEA Project Files
+/.idea
+*.iml
+
+# Distribution & Build
+/dist
+/build
+
+# Compiled Modules
+/__pycache__
+*.pyc
+
+# Private Test Config
+/tests/priv*
+
+# Python egg metadata
+*.egg-info/
