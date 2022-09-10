@@ -11,24 +11,12 @@ import urllib3
 
 logger = logging.getLogger("iupy_restconf")
 
+# Private methods class.  Extendable.
 
-class RestConf:
-
-    configReady = True
+class Rest:
 
     def __init__(self):
-        """
-        Initialize the variables in the RestConf class.
-        """
         self._config = dict()
-        self.netconf_state = dict()
-        self.rc_operations = dict()
-        self.rc_data_modules = dict()
-        self.yang_library = str()
-
-    #
-    # Private Methods
-    #
 
     def _delete(self, url, **kwargs):
         """
@@ -38,7 +26,7 @@ class RestConf:
         :param kwargs:
         :return:
         """
-        _logger = logging.getLogger("iupy_restconf/RestConf/_delete")
+        _logger = logging.getLogger("iupy_restconf/Rest/_delete")
         _logger.debug("{}".format(url))
 
         # Try the request as given.
@@ -66,7 +54,7 @@ class RestConf:
         :param kwargs:
         :return:
         """
-        _logger = logging.getLogger("iupy_restconf/RestConf/_get")
+        _logger = logging.getLogger("iupy_restconf/Rest/_get")
         _logger.debug("{}".format(url))
 
         # Try the request as given.
@@ -81,7 +69,7 @@ class RestConf:
             return None
 
         # Log Response Text to debug with an error state.
-        if response.status_code >= 400:
+        if response.status_code >= 300:
             _logger.debug("Response Text: {}".format(response.text))
 
         return response
@@ -93,7 +81,7 @@ class RestConf:
         :param url:
         :return:
         """
-        _logger = logging.getLogger("iupy_restconf/RestConf/_patch")
+        _logger = logging.getLogger("iupy_restconf/Rest/_patch")
         _logger.debug("{}".format(url))
 
         # Try the request as given.
@@ -120,7 +108,7 @@ class RestConf:
         :param url:
         :return:
         """
-        _logger = logging.getLogger("iupy_restconf/RestConf/_post")
+        _logger = logging.getLogger("iupy_restconf/Rest/_post")
         _logger.debug("{}".format(url))
 
         # Try the request as given.
@@ -147,7 +135,7 @@ class RestConf:
         :param url:
         :return:
         """
-        _logger = logging.getLogger("iupy_restconf/RestConf/_put")
+        _logger = logging.getLogger("iupy_restconf/Rest/_put")
         _logger.debug("{}".format(url))
 
         # Try the request as given.
@@ -167,11 +155,25 @@ class RestConf:
 
         return response
 
-    #
-    # Public Methods
-    #
 
-    def delete(self, url, **kwargs):
+# Extensions to class Rest, for RESTCONF purposes.
+
+class RestConf(Rest):
+
+    configReady = True
+
+    def __init__(self):
+        """
+        Initialize the variables in the RestConf class.
+        """
+        super().__init__()
+
+        self.netconf_state = dict()
+        self.rc_operations = dict()
+        self.rc_data_modules = dict()
+        self.yang_library = str()
+
+    def delete(self, url):
         """
         Access to the _delete function.
 
@@ -180,7 +182,15 @@ class RestConf:
         :return:
         """
 
-        return
+        # Add Transport, Host, and RestConf base to a URL.
+        new_url = "{}://{}{}/{}".format(self._config['transport'], self._config['host'],
+                                        self._config['base'], url)
+
+        # Get the response
+        response = self._delete(new_url,
+                                headers={'Accept': 'application/yang-data+json, application/yang-data.errors+json'})
+
+        return response
 
     def get(self, url):
         """
@@ -384,9 +394,7 @@ class RestConf:
 
         return False
 
-    #
     # Diagnostic Prints
-    #
 
     def show_operations_resources(self):
         if len(self.rc_operations):
