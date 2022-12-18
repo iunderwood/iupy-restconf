@@ -252,9 +252,7 @@ class RestConf(Rest):
         # Return the response
         return response
 
-    #
     # Method Consumers
-    #
 
     def connect(self, **kwargs):
         """
