@@ -13,6 +13,7 @@ logger = logging.getLogger("iupy_restconf")
 
 # Private methods class.  Extendable.
 
+
 class Rest:
 
     def __init__(self):
@@ -204,7 +205,7 @@ class RestConf(Rest):
         new_url = "{}://{}{}/{}".format(self._config['transport'], self._config['host'],
                                         self._config['base'], url)
 
-        # Get the response
+        # Get the response.
         response = self._get(new_url,
                              headers={'Accept': 'application/yang-data+json, application/yang-data.errors+json'})
 
@@ -215,7 +216,7 @@ class RestConf(Rest):
         new_url = "{}://{}{}/{}".format(self._config['transport'], self._config['host'],
                                         self._config['base'], url)
 
-        # Get the response
+        # Get the response, import JSON data.
         response = self._patch(new_url,
                                headers={'Accept': 'application/yang-data+json, application/yang-data.errors+json',
                                         'Content-Type': 'application/yang-data+json'},
@@ -229,7 +230,7 @@ class RestConf(Rest):
         new_url = "{}://{}{}/{}".format(self._config['transport'], self._config['host'],
                                         self._config['base'], url)
 
-        # Get the response
+        # Get the response, import JSON data.
         response = self._post(new_url,
                               headers={'Accept': 'application/yang-data+json, application/yang-data.errors+json',
                                        'Content-Type': 'application/yang-data+json'},
@@ -243,7 +244,7 @@ class RestConf(Rest):
         new_url = "{}://{}{}/{}".format(self._config['transport'], self._config['host'],
                                         self._config['base'], url)
 
-        # Get the response
+        # Get the response, import JSON data.
         response = self._put(new_url,
                              headers={'Accept': 'application/yang-data+json, application/yang-data.errors+json',
                                       'Content-Type': 'application/yang-data+json'},
