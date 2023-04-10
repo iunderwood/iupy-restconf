@@ -264,7 +264,11 @@ class RestConf(Rest):
         _logger = logging.getLogger("iupy_restconf/RestConf/connect")
 
         self._config = kwargs
-        self._config["base"] = None
+
+        if 'base' not in self._config:
+            self._config['base'] = None
+        if 'port' not in self._config:
+            self._config['port'] = 443
 
         # Loop through and make sure all the required attributes are present.
         _attributes = ('transport', 'host', 'un', 'pw')
@@ -285,29 +289,37 @@ class RestConf(Rest):
         else:
             _logger.debug("Config: {}".format(self._config))
 
-        # RFC6415 - Meta Context Discovery
-        connect_url = "{}://{}/.well-known/host-meta".format(self._config['transport'], self._config['host'])
-        response = self._get(connect_url)
+        # Check and see if we have a base specified in the connect.  This is set for devices that don't properly
+        # support Meta Context Discovery.
 
-        # We must have a response code of 200 in order to find the root.
-        if response.status_code == 200:
-            rdict = etxml.fromstring(response.text)
-
-            # Cycle through the attributes, looking for both rel and href.  Use the first reported value.
-            for child in rdict:
-                if 'rel' in child.attrib and 'href' in child.attrib:
-                    if child.attrib['rel'] == 'restconf':
-                        self._config['base'] = child.attrib['href']
-                        _logger.debug("Restconf Base: {}".format(self._config['base']))
-                        break
-
-            # If the base is None, log and return empty handed.
-            if self._config['base'] is None:
-                _logger.error("RESTCONF base not found.")
-                return False
+        if self._config['base'] is not None:
+            _logger.debug("Base provided as: {}".format(self._config['base']))
         else:
-            _logger.error("Status code {} returned.".format(response.status_code))
-            return response.text
+            # RFC6415 - Meta Context Discovery
+            connect_url = "{}://{}:{}/.well-known/host-meta".format(self._config['transport'],
+                                                                    self._config['host'],
+                                                                    self._config['port'])
+            response = self._get(connect_url)
+
+            # We must have a response code of 200 in order to find the root.
+            if response.status_code == 200:
+                rdict = etxml.fromstring(response.text)
+
+                # Cycle through the attributes, looking for both rel and href.  Use the first reported value.
+                for child in rdict:
+                    if 'rel' in child.attrib and 'href' in child.attrib:
+                        if child.attrib['rel'] == 'restconf':
+                            self._config['base'] = child.attrib['href']
+                            _logger.debug("Restconf Base: {}".format(self._config['base']))
+                            break
+
+                # If the base is None, log and return empty handed.
+                if self._config['base'] is None:
+                    _logger.error("RESTCONF base not found.")
+                    return False
+            else:
+                _logger.error("Status code {} returned.".format(response.status_code))
+                return response.text
 
         return True
 
