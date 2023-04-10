@@ -393,7 +393,12 @@ class RestConf(Rest):
 
         response = self.get("data/ietf-yang-library:modules-state")
 
-        self.rc_data_modules = json.loads(response.text)
+        try:
+            self.rc_data_modules = json.loads(response.text)
+        except json.decoder.JSONDecodeError:
+            logger.debug("Status Code: {} / {}".format(response.status_code,
+                                                       response.text.strip()))
+            self.rc_data_modules = None
 
     def get_netconf_state(self):
         if self.configReady is False or self._config['base'] is None:
@@ -402,7 +407,12 @@ class RestConf(Rest):
         response = self.get("data/netconf-state")
 
         if response is not False:
-            self.netconf_state = json.loads(response.text)
+            try:
+                self.netconf_state = json.loads(response.text)
+            except json.decoder.JSONDecodeError:
+                logger.debug("Status Code: {} / {}".format(response.status_code,
+                                                           response.text.strip()))
+                self.netconf_state = None
 
     def get_operations_resources(self):
         if self.configReady is False or self._config['base'] is None:
@@ -410,7 +420,12 @@ class RestConf(Rest):
 
         response = self.get("operations")
 
-        self.rc_operations = json.loads(response.text)
+        try:
+            self.rc_operations = json.loads(response.text)
+        except json.decoder.JSONDecodeError:
+            logger.debug("Status Code: {} / {}".format(response.status_code,
+                                                       response.text.strip()))
+            self.rc_operations = None
 
     def get_yang_date(self):
         """
@@ -423,7 +438,13 @@ class RestConf(Rest):
 
         response = self.get("yang-library-version")
 
-        self.yang_library = json.loads(response.text)
+        # JSON Load, only if we have an ok response.
+        try:
+            self.yang_library = json.loads(response.text)
+        except json.decoder.JSONDecodeError:
+            logger.debug("Status Code: {} / {}".format(response.status_code,
+                                                       response.text.strip()))
+            self.yang_library = None
 
     # Checks on loaded resources.
 
@@ -435,6 +456,10 @@ class RestConf(Rest):
         :return:
         """
         _logger = logging.getLogger("iupy_restconf/RestConf/check_operations_resources")
+
+        if self.rc_operations is None:
+            _logger.debug("Resource is None.")
+            return False
 
         if len(self.rc_operations) == 0:
             return False
@@ -456,6 +481,10 @@ class RestConf(Rest):
         """
         _logger = logging.getLogger("iupy_restconf/RestConf/check_data_modules")
 
+        if self.rc_data_modules is None:
+            _logger.debug("rc_data_modules is None")
+            return False
+
         if len(self.rc_data_modules) == 0:
             return False
 
@@ -472,18 +501,24 @@ class RestConf(Rest):
     # Diagnostic Prints
 
     def show_operations_resources(self):
-        if len(self.rc_operations):
-            for root in self.rc_operations:
-                print("{}".format(root))
-                for child in self.rc_operations[root]:
-                    print("  {} -> {}".format(child, self.rc_operations[root][child]))
+        if self.rc_operations is not None:
+            if len(self.rc_operations):
+                for root in self.rc_operations:
+                    print("{}".format(root))
+                    for child in self.rc_operations[root]:
+                        print("  {} -> {}".format(child, self.rc_operations[root][child]))
+            else:
+                print("0 Operations to display.")
         else:
-            print("0 Operations to display.")
+            print("No operations reported")
 
     def show_data_modules(self):
-        if len(self.rc_data_modules['ietf-yang-library:modules-state']['module']):
-            print("{} Data Modules".format(len(self.rc_data_modules['ietf-yang-library:modules-state']['module'])))
-            for root in self.rc_data_modules['ietf-yang-library:modules-state']['module']:
-                pprint.pprint(root)
+        if self.rc_data_modules is not None:
+            if len(self.rc_data_modules['ietf-yang-library:modules-state']['module']):
+                print("{} Data Modules".format(len(self.rc_data_modules['ietf-yang-library:modules-state']['module'])))
+                for root in self.rc_data_modules['ietf-yang-library:modules-state']['module']:
+                    pprint.pprint(root)
+            else:
+                print("0 Data Modules to display.")
         else:
-            print("0 Data Modules to display.")
+            print("No data modules reported.")
