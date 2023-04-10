@@ -184,8 +184,11 @@ class RestConf(Rest):
         """
 
         # Add Transport, Host, and RestConf base to a URL.
-        new_url = "{}://{}{}/{}".format(self._config['transport'], self._config['host'],
-                                        self._config['base'], url)
+        new_url = "{}://{}:{}{}/{}".format(self._config['transport'],
+                                           self._config['host'],
+                                           self._config['port'],
+                                           self._config['base'],
+                                           url)
 
         # Get the response
         response = self._delete(new_url,
@@ -202,8 +205,11 @@ class RestConf(Rest):
         """
 
         # Add Transport, Host, and RestConf base to a URL.
-        new_url = "{}://{}{}/{}".format(self._config['transport'], self._config['host'],
-                                        self._config['base'], url)
+        new_url = "{}://{}:{}{}/{}".format(self._config['transport'],
+                                           self._config['host'],
+                                           self._config['port'],
+                                           self._config['base'],
+                                           url)
 
         # Get the response.
         response = self._get(new_url,
@@ -213,8 +219,11 @@ class RestConf(Rest):
 
     def patch(self, url, data):
         # Add Transport, Host, and RestConf base to a URL.
-        new_url = "{}://{}{}/{}".format(self._config['transport'], self._config['host'],
-                                        self._config['base'], url)
+        new_url = "{}://{}:{}{}/{}".format(self._config['transport'],
+                                           self._config['host'],
+                                           self._config['port'],
+                                           self._config['base'],
+                                           url)
 
         # Get the response, import JSON data.
         response = self._patch(new_url,
@@ -227,8 +236,11 @@ class RestConf(Rest):
 
     def post(self, url, data):
         # Add Transport, Host, and RestConf base to a URL.
-        new_url = "{}://{}{}/{}".format(self._config['transport'], self._config['host'],
-                                        self._config['base'], url)
+        new_url = "{}://{}:{}{}/{}".format(self._config['transport'],
+                                           self._config['host'],
+                                           self._config['port'],
+                                           self._config['base'],
+                                           url)
 
         # Get the response, import JSON data.
         response = self._post(new_url,
@@ -241,8 +253,11 @@ class RestConf(Rest):
 
     def put(self, url, data):
         # Add Transport, Host, and RestConf base to a URL.
-        new_url = "{}://{}{}/{}".format(self._config['transport'], self._config['host'],
-                                        self._config['base'], url)
+        new_url = "{}://{}:{}{}/{}".format(self._config['transport'],
+                                           self._config['host'],
+                                           self._config['port'],
+                                           self._config['base'],
+                                           url)
 
         # Get the response, import JSON data.
         response = self._put(new_url,
