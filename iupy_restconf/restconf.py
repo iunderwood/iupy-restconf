@@ -75,6 +75,34 @@ class Rest:
 
         return response
 
+    def _head(self, url, **kwargs):
+        """
+        Performs an authenticated HEAD against a URL.  If successful, returns a response object.
+
+        :param url:
+        :param kwargs:
+        :return:
+        """
+        _logger = logging.getLogger("iupy_restconf/Rest/_head")
+        _logger.debug("{}".format(url))
+
+        # Try the request as given.
+        try:
+            response = requests.head(url, verify=self._config['ssl_verify'],
+                                     headers=kwargs.get("headers"),
+                                     auth=(self._config['un'], self._config['pw']))
+
+        # Don't raise an exception on connection errors.
+        except requests.exceptions.ConnectionError as error_message:
+            _logger.error("Connection error to {}: {}".format(self._config['host'], error_message))
+            return None
+
+        # Log Response Text to debug with an error state.
+        if response.status_code >= 300:
+            _logger.debug("Response Text: {}".format(response.text))
+
+        return response
+
     def _patch(self, url, data, **kwargs):
         """
         Performs an authenticated GET against a URL.  If successful, returns a response object.
@@ -214,6 +242,27 @@ class RestConf(Rest):
         # Get the response.
         response = self._get(new_url,
                              headers={'Accept': 'application/yang-data+json, application/yang-data.errors+json'})
+
+        return response
+
+    def head(self, url):
+        """
+        Access to the _head function, but building out the whole base URL.
+
+        :param url:
+        :return:
+        """
+
+        # Add Transport, Host, and RestConf base to a URL.
+        new_url = "{}://{}:{}{}/{}".format(self._config['transport'],
+                                           self._config['host'],
+                                           self._config['port'],
+                                           self._config['base'],
+                                           url)
+
+        # Get the response.
+        response = self._head(new_url,
+                              headers={'Accept': 'application/yang-data+json, application/yang-data.errors+json'})
 
         return response
 
