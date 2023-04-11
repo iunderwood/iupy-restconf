@@ -9,7 +9,7 @@ if __name__ == "__main__":
 
     rcs = iupy_restconf.RestConf()
 
-    state = rcs.connect(transport="https", host="resttest", un="user", pw="pass!")
+    state = rcs.connect(transport="https", host="testhost", un="testuser", pw="testpass")
 
     if state is True:
         print("Connection complete.")
