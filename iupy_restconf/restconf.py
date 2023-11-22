@@ -283,7 +283,7 @@ class RestConf(Rest):
         # Return the response
         return response
 
-    def post(self, url, data):
+    def post(self, url, data=None):
         # Add Transport, Host, and RestConf base to a URL.
         new_url = "{}://{}:{}{}/{}".format(self._config['transport'],
                                            self._config['host'],
@@ -291,11 +291,17 @@ class RestConf(Rest):
                                            self._config['base'],
                                            url)
 
-        # Get the response, import JSON data.
-        response = self._post(new_url,
-                              headers={'Accept': 'application/yang-data+json, application/yang-data.errors+json',
-                                       'Content-Type': 'application/yang-data+json'},
-                              data=json.dumps(data))
+        if data is None:
+            # POST w/o data
+            response = self._post(new_url,
+                                  headers={'Accept': 'application/yang-data+json, application/yang-data.errors+json',
+                                           'Content-Type': 'application/yang-data+json'})
+        else:
+            # POST w/ data converted to JSON.
+            response = self._post(new_url,
+                                  headers={'Accept': 'application/yang-data+json, application/yang-data.errors+json',
+                                           'Content-Type': 'application/yang-data+json'},
+                                  data=json.dumps(data))
 
         # Return the response
         return response
