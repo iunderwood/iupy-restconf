@@ -125,7 +125,7 @@ class Rest:
             return None
 
         # Log Response Text to debug with an error state.
-        if response.status_code >= 400:
+        if response.status_code >= 300:
             _logger.debug("Response Text: {}".format(response.text))
 
         return response
