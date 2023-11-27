@@ -293,7 +293,7 @@ class RestConf(Rest):
 
         if data is None:
             # POST w/o data
-            response = self._post(new_url,
+            response = self._post(new_url, data,
                                   headers={'Accept': 'application/yang-data+json, application/yang-data.errors+json',
                                            'Content-Type': 'application/yang-data+json'})
         else:
